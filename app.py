@@ -27,3 +27,28 @@ def get_store(store_id):
         return stores[store_id]
     except KeyError:
         abort(404, message="Store not found.")
+
+
+@app.post("/item")  # http://127.0.0.1:5000/store/name/item
+def create_item():
+    item_data = request.get_json()
+
+    if item_data["store_id"] not in stores:
+        abort(404, message="Store not found")
+    item_id = uuid.uuid4().hex
+    item = {**item_data, "id": item_id}
+    items[item_id] = item
+    return item, 201
+
+
+@app.get("/item")  # http://127.0.0.1:5000/store/name/item
+def get_all_items():
+    return {"items": list(items.values())}
+
+
+@app.get("/item:<string:item_id>")
+def get_item(item_id):
+    try:
+        return items[item_id]
+    except KeyError:
+        abort(404, message="Item not found")
